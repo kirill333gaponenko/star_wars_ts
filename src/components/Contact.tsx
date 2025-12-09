@@ -1,5 +1,8 @@
-import {useEffect, useState} from "react";
-import {base_url, period_month} from "../utils/constants.ts";
+import {useContext, useEffect, useState} from "react";
+import {base_url, characters, defaultHero, period_month} from "../utils/constants.ts";
+import {SWContext} from "../utils/context.ts";
+import {useParams} from "react-router";
+import ErrorPage from "./ErrorPage.tsx";
 
 const Contact = () => {
     const [planets, setPlanets] = useState<string[]>(() => {
@@ -10,6 +13,16 @@ const Contact = () => {
             return ['wait...']
         }
     });
+
+    const {changeHero} = useContext(SWContext);
+    const {heroId = defaultHero} = useParams();
+
+    useEffect(() => {
+        if (!(heroId in characters)) {
+            return;
+        }
+        changeHero(heroId);
+    }, [heroId]);
 
     useEffect(() => {
         const getPlanets = async () => {
@@ -28,7 +41,7 @@ const Contact = () => {
         }
     }, [])
 
-    return (
+    return (heroId in characters) ?  (
         <form className={`w-4/5 my-0 mx-auto rounded-[5px] bg-[#f2f2f2] p-5`} onSubmit={(e) => {
             e.preventDefault();
         }}>
@@ -59,7 +72,7 @@ const Contact = () => {
                 type="submit">Submit
             </button>
         </form>
-    )
+    ) :<ErrorPage/>
 }
 
 export default Contact;
